@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =8
+let g:netrw_dirhist_8='/home/blyat/.local/bin/__pycache__'
+let g:netrw_dirhist_7='/mnt/sdb1/Code/src/st'
+let g:netrw_dirhist_6='/mnt/sdb1/Code/src'
+let g:netrw_dirhist_5='/mnt/sdb1/Code'
+let g:netrw_dirhist_4='/mnt/sdb1'
+let g:netrw_dirhist_3='/mnt'
+let g:netrw_dirhist_2='/'
+let g:netrw_dirhist_1='/mnt/sdb1/Code/git/st'
+let g:netrw_dirhist_0='/mnt/sdb1/.shlib'
+let g:netrw_dirhist_9='/mnt/sdb1/Code/Python/4QT'

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if pgrep "lemonbar" >/dev/null 2>&1 ; then
+	pkill lemonbar
+	bspc config bottom_padding 0
+else
+	$HOME/.local/bin/custom_bar.sh | lemonbar -b -B \#000000 -F \#FFFFFF -f "monospace,-misc-symbola-medium-r-semicondensed--0-0-0-0-p-0-iso10646-1" &
+fi
+

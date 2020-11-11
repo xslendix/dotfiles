@@ -1,0 +1,6 @@
+#!/bin/sh
+
+d=$(date +"Screenshot_%d_%m_%Y_%H:%M:%S:%N.png")
+scrot "$HOME/Pictures/Screenies/${d}"
+xclip -selection clipboard -t image/png -i $HOME/Pictures/Screenies/${d}
+

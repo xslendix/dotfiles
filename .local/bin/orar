@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "
++----------------+-------------+------------+------------+-------------+
+|      Luni      |    Marti    |  Miercuri  |    Joi     |   Vineri    |
++----------------+-------------+------------+------------+-------------+
+|  Muzica/Desen  |  Franceza   |   Fizica   | Matematica |   Chimie    |
+|   Matematica   |  Franceza   | Ed. Fizica |  Engleza   |   Chimie    |
+|   Matematica   | Ed. Fizica  |   Fizica   | Matematica | Ed. Antrep. |
+|  Informatica   | Informatica |  Geografie |  Engleza   |   Religie   |
+|     Fizica     |  Biologie   |  Istorie   |   Romana   | Psihologie  |
+|    Engleza     |  Biologie   |   Romana   |   Romana   |   Engleza   |
++----------------+-------------+------------+------------+-------------+
+"
+

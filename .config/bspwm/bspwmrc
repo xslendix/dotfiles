@@ -1,0 +1,37 @@
+#!/bin/sh
+
+desktopnames="I M >_ G S 6 7 8 9 10"
+
+pgrep -x sxhkd > /dev/null || sxhkd &
+
+bspc monitor -d 1 2 3 4 5 6 7 8 9 10
+#bspc monitor -d $desktopnames
+
+bspc config border_width         2
+bspc config window_gap          12
+
+bspc config single_monocle true
+bspc config gapless_monocle true
+
+bspc config split_ratio          0.52
+bspc config borderless_monocle   true
+bspc config gapless_monocle      true
+
+bspc rule -a Zathura state=tiled
+bspc rule -a Pavucontrol state=floating
+bspc rule -a mpv state=floating
+bspc rule -a Vimpc desktop='^2'
+bspc rule -a Vis desktop='^2'
+bspc rule -a icecat desktop='^1'
+bspc rule -a Chromium desktop='^1'
+bspc rule -a Kupfer.py focus=on
+bspc rule -a Screenkey manage=off
+
+xsetroot -cursor_name left_ptr
+pkill lemonbar > /dev/null
+/home/blyat/.local/bin/custom_bar.sh | lemonbar -b -B \#000000 -F \#FFFFFF -f "monospace,-misc-symbola-medium-r-semicondensed--0-0-0-0-p-0-iso10646-1" &
+#/home/blyat/.local/bin/custom_bar.sh | lemonbar -b -B \#000000 -F \#FFFFFF -f "monospace,symbola" &
+#pkill stalonetray > /dev/null
+#(stalonetray -t true --window-type dock --tint-level 0 --geometry 0.5x0.5+0-0 -i 16 --background "#000000" & sleep 0.5; bspc config top_padding 8) &
+
+

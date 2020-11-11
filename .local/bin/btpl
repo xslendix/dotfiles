@@ -1,0 +1,25 @@
+#!/bin/sh
+
+
+if [ $# -eq 0 ]; then
+	url="$(printf "$(xclip -o)" | dmenu -p "Enter YT URL:")" || exit 1
+else
+	url=$1
+fi
+
+choice="$(printf "1080p\n720p\n480p\n360p\n240p\n144p" | dmenu -i -p "Enter resolution:")" || exit
+
+res=1080
+
+case "$choice" in
+	1080p) res=1080 ;;
+	720p) res=720 ;;
+	480p) res=480 ;;
+	360p) res=360 ;;
+	240p) res=240 ;;
+	144p) res=144 ;;
+esac
+
+notify-send "Starting video..."
+mpv --geometry=50%x50% --ytdl-format="bestvideo[ext=mp4][height<=?$res]+bestaudio[ext=m4a]" $url &
+

@@ -1,0 +1,193 @@
+#
+# wm independent hotkeys
+#
+
+# terminal emulator
+super + Return
+	st
+
+super + space
+	st
+
+# Screenshots
+Print
+	/home/blyat/.local/bin/screen_all
+super + Print
+	/home/blyat/.local/bin/screen_select &
+super + shift + Print
+	/home/blyat/.local/bin/screen_win
+
+# Mpc
+XF86Audio{Next,Prev,Play,Stop}
+	mpc {next,prev,toggle,stop}
+
+# Volume control
+XF86Audio{RaiseVolume,LowerVolume,Mute}
+	amixer {-q set Master 5%+,-q set Master 5%-,set Master toggle}
+
+# program launcher
+super + d
+	dmenu_run
+
+# OwO?
+super+shift+o
+	bash -c "sleep .2; xdotool keyup shift Super_L o Caps_Lock; xdotool keydown shift; xdotool type Ò; sleep .02; xdotool keyup shift; xdotool type w; xdotool keydown shift; sleep .02; xdotool type Ó; xdotool keyup shift;"
+super+shift+i
+	bash -c "sleep .2; xdotool keyup shift Super_L i Caps_Lock; xdotool keydown shift; xdotool type Ó; sleep .02; xdotool keyup shift; xdotool type w; xdotool keydown shift; sleep .02; xdotool type Ò; xdotool keyup shift;"
+super+shift+u
+	bash -c "sleep .2; xdotool keyup shift Super_L u Caps_Lock; xdotool keydown shift; xdotool type Ú; sleep .02; xdotool keyup shift; xdotool type w; xdotool keydown shift; sleep .02; xdotool type Ù; xdotool keyup shift;"
+
+# Shortcuts
+super + b
+	icecat
+super + e
+	st -e aerc
+super + n
+	st -e newsboat
+super + a
+	st -e ranger
+super + s
+	st -e bpytop
+super + i
+	networkmanager_dmenu
+super + v
+	pavucontrol
+super + m
+	/home/blyat/.local/bin/start_ms.sh
+
+super + F1
+	/home/blyat/.local/bin/dmenurecord
+super + F2
+	/home/blyat/.local/bin/btpl
+super + F3
+	/home/blyat/.local/bin/dmenumount
+super + F4
+	/home/blyat/.local/bin/dmenuumount
+super + F5
+	/home/blyat/.local/bin/dmenuunicode
+super + F6
+	/home/blyat/.local/bin/power_dmenu
+
+# Bar toggle
+super + shift + g
+	/home/blyat/.local/bin/toggle_bar
+
+# make sxhkd reload its configuration files:
+#super + shift + r
+#	pkill -USR1 -x sxhkd
+
+#
+# bspwm hotkeys
+#
+
+# quit/restart bspwm
+super + shift + e
+	/home/blyat/.local/bin/prompt "Are you sure you want to exit this Xsession?" "bspc quit"
+super + shift + r
+	bspc wm -r
+
+# close and kill
+super + q
+	bspc node -c
+super + shift + q
+	bspc node -k
+
+super + space
+	bspc node -t "~"{floating,tiled}
+
+# alternate between the tiled and monocle layout
+super + shift + m
+	bspc desktop -l next 
+
+# send the newest marked node to the newest preselected node
+#super + y
+#	bspc node newest.marked.local -n newest.!automatic.local
+
+# swap the current node and the biggest window
+super + g
+	bspc node -s biggest.window
+
+super + {z,x,c}
+	bspc node -p {east,south,cancel}
+
+#
+# state/flags
+#
+
+# set the window state
+super + {t,shift + t,y,f}
+	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+
+# set the node flags
+super + ctrl + {m,x,y,z}
+	bspc node -g {marked,locked,sticky,private}
+
+#
+# focus/swap
+#
+
+# focus the node in the given direction
+super + {_,shift + }{h,j,k,l}
+	bspc node -{f,s} {west,south,north,east}
+
+# focus the node for the given path jump
+super + {p,shift+b,comma,period}
+	bspc node -f @{parent,brother,first,second}
+
+# focus the next/previous window in the current desktop
+super + {_,shift + }c
+	bspc node -f {next,prev}.local.!hidden.window
+
+# focus the next/previous desktop in the current monitor
+#super + bracket{left,right}
+#	bspc desktop -f {prev,next}.local
+
+# focus the last node/desktop
+super + {grave,Tab}
+	bspc {node,desktop} -f last
+
+# focus the older or newer node in the focus history
+#super + {o,i}
+#	bspc wm -h off; \
+#	bspc node {older,newer} -f; \
+#	bspc wm -h on
+
+# focus or send to the given desktop
+super + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}'
+
+#
+# preselect
+#
+
+# preselect the direction
+super + ctrl + {h,j,k,l}
+	bspc node -p {west,south,north,east}
+
+# preselect the ratio
+super + ctrl + {1-9}
+	bspc node -o 0.{1-9}
+
+# cancel the preselection for the focused node
+super + ctrl + space
+	bspc node -p cancel
+
+# cancel the preselection for the focused desktop
+super + ctrl + shift + space
+	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
+
+#
+# move/resize
+#
+
+# expand a window by moving one of its side outward
+super + alt + {h,j,k,l}
+	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+# contract a window by moving one of its side inward
+super + alt + shift + {h,j,k,l}
+	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+
+# move a floating window
+super + {Left,Down,Up,Right}
+	bspc node -v {-20 0,0 20,0 -20,20 0}

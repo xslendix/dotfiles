@@ -1,0 +1,198 @@
+#!/bin/sh
+#
+# The GPLv2 License
+#
+#   Copyright (C) 2020  Peter Kenji Yamanaka
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program; if not, write to the Free Software Foundation, Inc.,
+#   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+# Lowest priority, super nice (make this number smaller to increase priority, cannot go below 0)
+__nice_value=19
+
+# PID list, do not touch
+__pids=""
+
+# $1 wallpaper
+# $2 geometry
+# $3 screen
+wrapped()
+{
+  printf -- '[ANIMWALL]: Launching...\n'
+  printf -- '    Wallpaper: "%s"\n' "$1"
+  printf -- '    Geometry:  "%s"\n' "$2"
+  printf -- '    Screen:    "%s"\n' "$3"
+
+  # Options "-un" only used by xwinwrap-git
+  # Will not work with shantz-xwinwrap-git
+
+  # Uses deprecated -wid option instead of --wid because
+  # xwinwrap will only interpret the WID as window id if it is
+  # on its own, attaching it with equals breaks it.
+  exec nice -n "${__nice_value}" xwinwrap \
+    -g "$2" \
+    -ni \
+    -st \
+    -sp \
+    -nf \
+    -b \
+    -un \
+    -- nice -n "${__nice_value}" mpv \
+    -wid WID "$1" \
+    --no-osc \
+    --no-osd-bar \
+    --loop-file \
+    --player-operation-mode=cplayer \
+    --no-audio \
+    --panscan=1.0 \
+    --no-keepaspect \
+    --no-input-default-bindings \
+    --hwdec
+}
+
+cancel()
+{
+  # Kill runaway pids
+  for p in ${__pids}; do
+    p="$(printf -- "%s" "${p}" \
+      | sed 's/^[[:blank:]]*//' | sed 's/[[:blank:]]*$//')"
+    if [ -n "${p}" ]; then
+      kill "${p}" > /dev/null 2>&1
+    fi
+  done
+
+  # Reset terminal in case it bugs out
+  reset
+}
+
+main()
+{
+  if ! command -v mpv > /dev/null; then
+    printf -- 'You must have "mpv" installed.\n'
+    return 1
+  fi
+
+  if ! command -v xwinwrap > /dev/null; then
+    printf -- 'You must have "xwinwrap" installed.\n'
+    return 1
+  fi
+
+  if ! command -v nice > /dev/null; then
+    printf -- 'You must have "nice" installed.\n'
+    return 1
+  fi
+
+  # Trap return signals
+  trap cancel INT TERM
+
+  # Check for config file
+  animwall_configs=""
+  config_dir="${XDG_CONFIG_DIR:-"${HOME}/.config"}/animwall"
+  config_location="${config_dir}/animwall.conf"
+  if [ -f "${config_location}" ] && [ -r "${config_location}" ]; then
+    printf -- 'Reading animwall.conf from %s\n' "${config_location}"
+    animwall_configs="$(cat -- "${config_location}")"
+  else
+    printf -- 'Could not find animwall.conf file at %s\n' "${config_location}"
+    printf -- 'Creating example file...\n'
+
+    # Make directory
+    mkdir -p "${config_dir}" || {
+      printf -- 'Failed to make configuration directory at: %s' "${config_dir}"
+      return 1
+    }
+
+    # Make config file
+    printf -- '%s\n' "$(cat << EOF
+# This is the configuration file for animwall
+#
+# Entries are expected one per line in the format
+# <FILE>:<WIDTHxHEIGHT+X+Y>:<SCREEN>
+#
+# Lines beginning with # are ignored
+~/wallpapers/example_1.mp4:1920x1080+0+0:0
+~/pictures/example2.jpg:2560x1440+1920+0:1
+EOF
+)" > "${config_location}"
+    return 1
+  fi
+
+  if [ -z "${animwall_configs}" ]; then
+    printf -- 'Animwall config was empty!\n'
+    return 1
+  fi
+
+  # Prepare IFS
+  # Split by lines only instead of whitespace
+  old_ifs="${IFS}"
+  IFS='
+'
+
+  # Parse config file
+  for config in ${animwall_configs}; do
+    case "${config}" in
+      \#*)
+        printf -- 'Ignore line with comment: %s\n' "${config}"
+        continue
+        ;;
+      *)
+        ;;
+    esac
+
+    split_config="$(printf -- "%s" "${config}" | tr ':' ' ')"
+    wallpaper="$(printf -- "%s" "${split_config}" | awk '{ print $1 }')"
+    geometry="$(printf -- "%s" "${split_config}" | awk '{ print $2 }')"
+    screen="$(printf -- "%s" "${split_config}" | awk '{ print $3 }')"
+
+    # In case the wallpaper path has ~ as HOME, we replace it
+    # Replace all $HOME with literal HOME
+    wallpaper="$(printf -- "%s" "${wallpaper}" | sed "s|^\~|\$HOME|g" | sed "s|^\$HOME|${HOME}|g" )"
+
+    if [ -n "${wallpaper}" ] && [ -n "${geometry}" ] && [ -n "${screen}" ]; then
+      wrapped "${wallpaper}" "${geometry}" "${screen}" &
+      __pids="$! ${__pids}"
+    else
+      if [ -z "${wallpaper}" ]; then
+        printf -- 'Missing wallpaper path in config: %s\n' "${config}"
+      fi
+
+      if [ -z "${geometry}" ]; then
+        printf -- 'Missing geometry in config: %s\n' "${config}"
+      fi
+
+      if [ -z "${screen}" ]; then
+        printf -- 'Missing screen in config: %s\n' "${config}"
+      fi
+    fi
+
+    unset split_config
+    unset wallpaper
+    unset geometry
+    unset screen
+    unset config
+  done
+
+  # Reset IFS
+  IFS="${old_ifs}"
+
+  # Wait for all wrapped processes to finish
+  #
+  # Do not quote so that this will split into a list, instead of a single,
+  # space separated input
+  # shellcheck disable=SC2086
+  wait ${__pids}
+  cancel
+}
+
+main "$@"

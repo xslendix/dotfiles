@@ -1,0 +1,10 @@
+16/10/20 (19:01:51) | ERROR: Input thread failed with exception: [Errno 5] Input/output error
+Traceback (most recent call last):
+  File "/bin/bpytop", line 822, in _get_key
+    input_key += sys.stdin.read(1)						#* Read 1 key safely with blocking on
+OSError: [Errno 5] Input/output error
+26/10/20 (12:37:56) | ERROR: '>' not supported between instances of 'NoneType' and 'int'
+Traceback (most recent call last):
+  File "/bin/bpytop", line 2738, in _collect_temps
+    if hasattr(entry, "high") and entry.high > 1: cls.cpu_temp_high = round(entry.high)
+TypeError: '>' not supported between instances of 'NoneType' and 'int'

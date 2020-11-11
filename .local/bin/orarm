@@ -1,0 +1,50 @@
+#!/bin/sh
+
+echo "
+Luni
+----
+Muzica/Desen
+Matematica
+Matematica
+Informatica
+Fizica
+Engleza
+
+Marti
+-----
+Franceza
+Franceza
+Ed. Fizica
+Informatica
+Biologie
+Biologie
+
+Miercuri
+--------
+Fizica
+Ed. Fizica
+Fizica
+Geografie
+Istorie
+Romana
+
+Joi
+----
+Matematica
+Engleza
+Matematica
+Engleza
+Romana
+Romana
+
+Vineri
+------
+Chimie
+Chimie
+Ed. Antrep.
+Religie
+Psihologie
+Engleza
+
+"
+

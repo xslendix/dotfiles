@@ -1,0 +1,15 @@
+#!/bin/sh
+
+CHOICE=$(printf "Shutdown\nReboot" | dmenu)
+
+case $CHOICE in
+	Shutdown)
+		sudo init 0
+		;;
+	Reboot)
+		sudo init 6
+		;;
+	*)
+		;;
+esac
+
